@@ -1,5 +1,5 @@
 <?php
-
+ 
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -10,8 +10,16 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
+ 
+Route::get('/', 'HomeController@showWelcome');
 
-Route::get('/', function()
-{
-	return View::make('hello');
-});
+/*
+ * Curly brackets specify a dynamic route parameter.
+ * @var name is passed in from the URI to the view.
+ */
+ 
+Route::get('/resume', 'HomeController@showResume');
+ 
+Route::get('/portfolio', 'HomeController@showPortfolio');
+ 
+Route::resource('posts', 'PostsController');
