@@ -2,6 +2,16 @@
 
 class PostsController extends \BaseController {
 
+
+	public function __construct()
+{
+    // call base controller constructor
+    parent::__construct();
+
+    // run auth filter before all methods on this controller except index and show
+    $this->beforeFilter('auth.basic', array('except' => array('index', 'show')));
+}
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -40,8 +50,33 @@ class PostsController extends \BaseController {
 		$post->content = Input::get('content');
 		$post->save();
 		return Redirect::action('PostsController@index');
+		$validator= Validator::make(Input::all(), Post::$rules);
+		if ($validator->fails()){
+			return Redirect::back()->withInput();
+			Session::flash('errorMessage', 'Your post needs title and body');
+			log::error('Post validator failed', Input::all());
 
-	}
+		 
+		    } else{
+			$post = new Post;
+			$post->title = Input::get('title');
+			$post->content = Input::get('content');
+			$post->save();
+
+			Log::info('Post was sucessfully saved');
+
+			$message = 'Post created sucessfully';
+
+			Session::flash('sucessMessage', $message);
+
+			return Redirect::action('PostsController@index');
+
+		}
+
+		}
+
+
+	
 
 
 	/**
@@ -52,7 +87,10 @@ class PostsController extends \BaseController {
 	 */
 	public function show($id)
 	{
-		$post = Post::findOrFail($id);
+		$post = Post::find($id);
+		if (!$post){
+			App::abort(404);
+		}
 		return View::make('posts.show')->with('post', $post);
 	
 	}
@@ -85,6 +123,7 @@ class PostsController extends \BaseController {
 		$post->save();
 		return Redirect::action('PostsController@index');
 	}
+
 	
 	
 
@@ -97,9 +136,18 @@ class PostsController extends \BaseController {
 	 
 	public function destroy($id)
 	{
-		return View::make('posts.destroy')->with('post' , $post);
+		$post = Post::find($id);
+		if (!$post){
+			App::abort(404);
+		}
+				$post->delete(); 
+				log::info('Post deleted sucessfully');
+				Session::flash('sucessMessage' , 'Post deleted sucessfully');
+				return Redirect::action('PostsController@index');
 
-	}
-
+		}
 
 }
+
+
+
