@@ -31,7 +31,7 @@ if (!empty($_SERVER['LARAVEL_ENV'])) {
     return $_SERVER['LARAVEL_ENV'];
 }
 
-return 'local';
+return 'production';
 });
 
 /*
